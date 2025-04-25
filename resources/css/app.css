@@ -1,0 +1,43 @@
+@import 'tailwindcss';
+
+@source '../../resources/views/**/*.blade.php';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source "../**/*.blade.php";
+@source "../**/*.js";
+@source "../**/*.vue";
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+
+@keyframes aurora-animation {
+    0% { background-position: 0% 50%; }
+    25% { background-position: 50% 80%; }
+    50% { background-position: 100% 50%; }
+    75% { background-position: 50% 20%; }
+    100% { background-position: 0% 50%; }
+}
+
+.bg-aurora {
+    background: linear-gradient(-45deg, #000000, #0C51A2, #08366C, #106CD8);
+    background-size: 300% 300%;
+    animation: aurora-animation 10s ease-in-out infinite;
+}
+
+/* Efeito de Névoa Sutil */
+.bg-aurora::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(8, 54, 108, 0.3) 30%, rgba(16, 108, 216, 0.3) 50%, rgba(0, 0, 0, 0.5) 90%);
+    background-size: 300% 300%;
+    animation: aurora-animation 20s ease-in-out infinite;
+    opacity: 0.5;
+    z-index: -1;
+}
+
+
