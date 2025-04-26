@@ -29,8 +29,12 @@ Route::prefix('bank-manager')->name('bank-manager.')->group(function () {
 // Grupo Pomodoro Timer
 Route::prefix('pomodoro-timer')->name('pomodoro-timer.')->group(function () {
     Route::get('/', [PomoTimerController::class, 'index'])->name('index');
+    // Projetos
+    Route::post('/projects', [PomoTimerController::class, 'store'])->name('projects.store');
+    // Tarefas
+    Route::post('/tasks', [PomoTimerController::class, 'storeTask'])->name('tasks.store');
 
-    // Exemplo de rota extra:
-    Route::get('/start', [PomoTimerController::class, 'start'])->name('start');
+    Route::post('/sessions', [PomoTimerController::class, 'storeSession'])->name('sessions.store');
+
 });
 
