@@ -7,6 +7,8 @@ use App\Http\Controllers\AppHealthMealController;
 use App\Http\Controllers\BankManagerController;
 use App\Http\Controllers\PomoTimerController;
 
+use App\Http\Controllers\SpotifyAuthController;
+
 // Página inicial geral
 Route::get('/', [IruyCodeController::class, 'welcome'])->name('iruycode.welcome');
 
@@ -37,4 +39,17 @@ Route::prefix('pomodoro-timer')->name('pomodoro-timer.')->group(function () {
     Route::post('/sessions', [PomoTimerController::class, 'storeSession'])->name('sessions.store');
 
 });
+
+
+
+
+Route::get('/spotify/login', [SpotifyAuthController::class, 'redirectToSpotify'])->name('spotify.login');
+Route::get('/callback', [SpotifyAuthController::class, 'handleCallback'])->name('spotify.callback');
+Route::get('/spotify/play', [SpotifyAuthController::class, 'startPlaylist'])->name('spotify.play');
+Route::get('/spotify/pause', [SpotifyAuthController::class, 'pausePlayback'])->name('spotify.pause');
+
+Route::get('/spotify/ping', [SpotifyAuthController::class, 'ping'])->name('spotify.ping');
+
+Route::get('/spotify/token', [SpotifyAuthController::class, 'getClientCredentialsToken'])->name('spotify.token');
+
 

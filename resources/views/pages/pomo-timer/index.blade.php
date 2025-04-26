@@ -7,27 +7,12 @@
         </div>
     @endif
 
-    {{-- Pomodoros --}}
-    {{-- <div x-data="pomodoro()" class="flex flex-col items-center justify-center bg-gray-800 text-white p-8 rounded-lg shadow-md">
-  <h1 class="text-2xl font-bold mb-2" x-text="modeLabel"></h1>
-
-  <div class="text-6xl font-mono mb-6">
-      <span x-text="minutes"></span>:<span x-text="seconds"></span>
-  </div>
-
-  <div class="flex flex-wrap justify-center gap-3 mb-4">
-      <button @click="startTimer" class="px-4 py-2 bg-green-500 hover:bg-green-600 rounded">Start</button>
-      <button @click="pauseTimer" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 rounded">Pause</button>
-      <button @click="resetTimer" class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded">Reset</button>
-  </div>
-
-  <button @click="nextMode" class="mt-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded">
-      Próximo Ciclo
-  </button>
-</div> --}}
+    <a href="{{ route('spotify.login') }}" class="px-4 py-2 bg-green-500 text-white rounded">
+        Conectar com Spotify
+    </a>
 
     <div x-data="pomodoro()"
-        class="flex flex-col items-center justify-center bg-gray-800 text-white p-8 rounded-lg shadow-md">
+        class="flex flex-col items-center justify-center mt-4 bg-gray-800 text-white p-8 rounded-lg shadow-md">
 
         <div class="mt-8 w-full max-w-md bg-gray-700 p-4 rounded-lg">
             <h2 class="text-xl font-bold mb-4">Suas Tarefas</h2>
@@ -41,16 +26,6 @@
                 </div>
             </template>
         </div>
-{{-- 
-        tasks: [
-        @foreach ($tasks as $task)
-            {
-            id: {{ $task->id }},
-            name: "{{ $task->task_name }}",
-            pomodoros: {{ $task->sessions->count() }},
-            },
-        @endforeach
-        ], --}}
 
         <!-- Selecionar Tarefa -->
         <div class="mb-4 w-full">
@@ -79,9 +54,12 @@
         <button @click="nextMode" class="mt-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded">
             Próximo Ciclo
         </button>
+
+        <button onclick="location.href='{{ route('spotify.play') }}'" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md text-white">
+            🎵 Iniciar Pomodoro com Música
+        </button>
+
     </div>
-
-
 
     {{-- Criar Projectos --}}
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-8 text-white">
@@ -153,166 +131,10 @@
             </form>
         </div>
     </div>
+
 @endsection
 
 @section('scripts')
-    {{-- <script>
-            function pomodoro() {
-                return {
-                    time: 1500, // 25 min default
-                    timer: null,
-                    mode: 'pomodoro', // pomodoro | shortBreak | longBreak
-                    cycle: 0, // para contar a cada 2 ciclos
-
-                    get minutes() {
-                        return String(Math.floor(this.time / 60)).padStart(2, '0');
-                    },
-                    get seconds() {
-                        return String(this.time % 60).padStart(2, '0');
-                    },
-                    get modeLabel() {
-                        return {
-                            pomodoro: "Pomodoro - Foco 🍅",
-                            shortBreak: "Pausa Curta 🧘‍♂️",
-                            longBreak: "Pausa Longa 🌴"
-                        }[this.mode];
-                    },
-                    startTimer() {
-                        if (this.timer) return;
-
-                        this.timer = setInterval(() => {
-                            if (this.time > 0) {
-                                this.time--;
-                            } else {
-                                this.nextMode();
-                                this.resetTimer();
-                                this.startTimer();
-                            }
-                        }, 1000);
-                    },
-                    pauseTimer() {
-                        clearInterval(this.timer);
-                        this.timer = null;
-                    },
-                    resetTimer() {
-                        this.pauseTimer();
-
-                        if (this.mode === 'pomodoro') this.time = 1500;
-                        else if (this.mode === 'shortBreak') this.time = 300;
-                        else if (this.mode === 'longBreak') this.time = 900;
-                    },
-                    nextMode() {
-                        if (this.mode === 'pomodoro') {
-                            this.cycle++;
-                            this.mode = (this.cycle % 2 === 0) ? 'longBreak' : 'shortBreak';
-                        } else {
-                            this.mode = 'pomodoro';
-                        }
-                        this.resetTimer();
-                    }
-                };
-            }
-    </script> --}}
-
-
-    {{-- funciona novo --}}
-    {{-- <script>
-        function pomodoro() {
-            return {
-                time: 1500, // 25 min default
-                timer: null,
-                mode: 'pomodoro', // pomodoro | shortBreak | longBreak
-                cycle: 0, // para contar ciclos de Pomodoro
-                selectedTaskId: '', // id da tarefa selecionada
-
-                get minutes() {
-                    return String(Math.floor(this.time / 60)).padStart(2, '0');
-                },
-                get seconds() {
-                    return String(this.time % 60).padStart(2, '0');
-                },
-                get modeLabel() {
-                    return {
-                        pomodoro: "Pomodoro - Foco 🍅",
-                        shortBreak: "Pausa Curta 🧘‍♂️",
-                        longBreak: "Pausa Longa 🌴"
-                    } [this.mode];
-                },
-                startTimer() {
-                    if (this.timer) return;
-
-                    this.timer = setInterval(() => {
-                        if (this.time > 0) {
-                            this.time--;
-                        } else {
-                            this.handlePomodoroFinish();
-                        }
-                    }, 1000);
-                },
-                pauseTimer() {
-                    clearInterval(this.timer);
-                    this.timer = null;
-                },
-                resetTimer() {
-                    this.pauseTimer();
-
-                    if (this.mode === 'pomodoro') this.time = 1500;
-                    else if (this.mode === 'shortBreak') this.time = 300;
-                    else if (this.mode === 'longBreak') this.time = 900;
-                },
-                nextMode() {
-                    if (this.mode === 'pomodoro') {
-                        this.savePomodoro(); // Salvar quando terminar Pomodoro manualmente
-                        this.cycle++;
-                        this.mode = (this.cycle % 2 === 0) ? 'longBreak' : 'shortBreak';
-                    } else {
-                        this.mode = 'pomodoro';
-                    }
-                    this.resetTimer();
-                },
-                handlePomodoroFinish() {
-                    if (this.mode === 'pomodoro') {
-                        this.savePomodoro(); // Salvar quando o tempo zerar
-                    }
-                    this.nextMode();
-                    this.startTimer(); // Começa o próximo automaticamente
-                },
-                savePomodoro() {
-                    if (!this.selectedTaskId) {
-                        alert('Por favor, selecione uma tarefa antes de iniciar!');
-                        return;
-                    }
-
-                    fetch("{{ route('pomodoro-timer.sessions.store') }}", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            },
-                            body: JSON.stringify({
-                                task_id: this.selectedTaskId,
-                            }),
-                        })
-                        .then(response => {
-                            if (response.ok) {
-                                console.log('Pomodoro salvo!');
-                                // Atualizar contador local
-                                const task = this.tasks.find(t => t.id == this.selectedTaskId);
-                                if (task) {
-                                    task.pomodoros += 1;
-                                }
-                            } else {
-                                console.error('Erro ao salvar pomodoro');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Erro:', error);
-                        });
-                }
-            }
-        }
-    </script> --}}
-
     <script>
         function pomodoro() {
             return {
@@ -322,7 +144,7 @@
                 cycle: 0,
                 selectedTaskId: '',
 
-                // 👇 Aqui está o array de tarefas que vem do Blade
+                // Receber as tarefas do backend
                 tasks: [
                     @foreach ($tasks as $task)
                         {
@@ -333,7 +155,7 @@
                     @endforeach
                 ],
 
-                // ⏱️ Getters
+                // Mostrar o tempo em minutos e segundos formatado
                 get minutes() {
                     return String(Math.floor(this.time / 60)).padStart(2, '0');
                 },
@@ -348,7 +170,7 @@
                     } [this.mode];
                 },
 
-                // ⏯️ Funções do timer
+                // Funções do timer
                 startTimer() {
                     if (this.timer) return;
 
@@ -359,10 +181,16 @@
                             this.handlePomodoroFinish();
                         }
                     }, 1000);
+
+                    // ▶️ Começa a playlist do Spotify
+                    fetch('/spotify/play');
                 },
                 pauseTimer() {
                     clearInterval(this.timer);
                     this.timer = null;
+
+                    // ⏸️ Pausa o Spotify também
+                    fetch('/spotify/pause');
                 },
                 resetTimer() {
                     this.pauseTimer();
@@ -380,16 +208,21 @@
                         this.mode = 'pomodoro';
                     }
                     this.resetTimer();
+
+                    // Pausa o som ao mudar o modo (caso não queira música nas pausas)
+                    fetch('/spotify/pause');
                 },
                 handlePomodoroFinish() {
                     if (this.mode === 'pomodoro') {
                         this.savePomodoro();
                     }
                     this.nextMode();
-                    this.startTimer(); // Começa próximo automático
+
+                    fetch("{{ route('spotify.pause') }}");
+
                 },
 
-                // 📩 Salvar Pomodoro e atualizar contador
+                // Salvar Pomodoro e atualizar contador
                 savePomodoro() {
                     if (!this.selectedTaskId) {
                         alert('Por favor, selecione uma tarefa antes de iniciar!');
