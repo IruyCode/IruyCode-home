@@ -11,4 +11,10 @@ class IruyCodeController extends Controller
     {
         return view('pages.iruycode.welcome');
     }
+
+
+    public function test()
+    {
+        return view('pages.iruycode.test');
+    }
 }

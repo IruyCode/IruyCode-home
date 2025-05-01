@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,38 +8,47 @@
     @vite('resources/css/app.css') <!-- Garante que o Tailwind está funcionando -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-      <!-- DataTables CSS -->
-      <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
-      <!-- jQuery -->
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  
-      <!-- DataTables JS -->
-      <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.4.1/css/dataTables.dateTime.min.css">
+
+
+
+
     <style>
         /* Corrige textos do DataTables no modo escuro */
         .dataTables_wrapper {
-            color: #f3f4f6; /* text-gray-100 */
+            color: #f3f4f6;
+            /* text-gray-100 */
         }
-  
-      .dataTables_paginate .paginate_button {
-          color: #f3f4f6 !important;
-          background-color: transparent !important;
-          border: 1px solid #4b5563; /* gray-600 */
-      }
-  
-      .dataTables_paginate .paginate_button.current {
-          background-color: #3b82f6 !important; /* blue-500 */
-          color: white !important;
-      }
+
+        .dataTables_paginate .paginate_button {
+            color: #f3f4f6 !important;
+            background-color: transparent !important;
+            border: 1px solid #4b5563;
+            /* gray-600 */
+        }
+
+        .dataTables_paginate .paginate_button.current {
+            background-color: #3b82f6 !important;
+            /* blue-500 */
+            color: white !important;
+        }
     </style>
-     
-    
+
+
 </head>
 
 <body class="bg-aurora flex flex-col min-h-screen relative">
-    
+
     <!-- Navbar -->
     <header class="fixed top-0 left-0 w-full bg-black bg-opacity-80 backdrop-blur-md shadow-lg z-50">
         <div class="container mx-auto px-6 py-2 flex justify-between items-center">
@@ -61,7 +71,7 @@
             <a href="#" class="text-white text-2xl font-bold flex items-center">
                 <img src="{{ asset($logo) }}" alt="Logo" class="h-20 mr-2">
             </a>
-            
+
             <!-- Menu Desktop -->
             <nav>
                 <ul class="hidden md:flex space-x-8 items-center">
@@ -73,38 +83,47 @@
                         <button class="text-white hover:text-blue-400 transition-colors">Projetos</button>
 
                         <!-- Dropdown -->
-                        <ul x-show="open" x-transition class="absolute bg-black bg-opacity-90 text-white mt-2 py-2 w-48 rounded shadow-lg z-50">
+                        <ul x-show="open" x-transition
+                            class="absolute bg-black bg-opacity-90 text-white mt-2 py-2 w-48 rounded shadow-lg z-50">
                             <li>
-                                <a href="{{ route('health-meal.index') }}" class="block px-4 py-2 hover:bg-blue-600 hover:text-white">Health Meal</a>
+                                <a href="{{ route('health-meal.index') }}"
+                                    class="block px-4 py-2 hover:bg-blue-600 hover:text-white">Health Meal</a>
                             </li>
                             <li>
-                                <a href="{{ route('bank-manager.index') }}" class="block px-4 py-2 hover:bg-blue-600 hover:text-white">Bank Manager</a>
+                                <a href="{{ route('bank-manager.index') }}"
+                                    class="block px-4 py-2 hover:bg-blue-600 hover:text-white">Bank Manager</a>
                             </li>
                             <li>
-                                <a href="{{ route('pomodoro-timer.index') }}" class="block px-4 py-2 hover:bg-blue-600 hover:text-white">Pomodoro Timer</a>
+                                <a href="{{ route('pomodoro-timer.index') }}"
+                                    class="block px-4 py-2 hover:bg-blue-600 hover:text-white">Pomodoro Timer</a>
                             </li>
                         </ul>
                     </li>
 
 
-                    <li><a href="#" class="text-white hover:text-blue-400 transition-colors">Criar Refeicoes</a></li>
-                    <li><a href="#contactos" class="text-white hover:text-blue-400 transition-colors">Portifolio</a></li>
+                    <li><a href="#" class="text-white hover:text-blue-400 transition-colors">Criar Refeicoes</a>
+                    </li>
+                    <li><a href="#contactos" class="text-white hover:text-blue-400 transition-colors">Portifolio</a>
+                    </li>
                 </ul>
             </nav>
 
             <!-- Botão Menu Mobile -->
             <button id="menu-btn" class="md:hidden text-white focus:outline-none" aria-label="Abrir menu">
-                <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
                 </svg>
             </button>
 
             <!-- Menu Mobile -->
-            <div id="mobile-menu" class="hidden absolute top-full left-0 w-full bg-black bg-opacity-90 z-40" x-data="{ openProjetos: false }">
+            <div id="mobile-menu" class="hidden absolute top-full left-0 w-full bg-black bg-opacity-90 z-40"
+                x-data="{ openProjetos: false }">
                 <ul class="text-center py-4">
                     <!-- Projetos com submenus -->
                     <li class="py-2">
-                       <button @click="openProjetos = !openProjetos" class="text-white hover:text-blue-400 w-full text-center px-4 py-2">
+                        <button @click="openProjetos = !openProjetos"
+                            class="text-white hover:text-blue-400 w-full text-center px-4 py-2">
                             Projetos
                         </button>
 
@@ -156,8 +175,8 @@
         </template>
     </div> --}}
 
-     <!-- Main content -->
-     <main class="flex-grow px-6 pt-20">
+    <!-- Main content -->
+    <main class="flex-grow px-6 pt-20">
         <!-- Aqui vão as páginas que mudam -->
         @yield('content')
     </main>
@@ -165,15 +184,17 @@
 
     <footer class="bg-black text-white py-10 mt-10 border-t border-gray-800">
         <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
-            
+
             <!-- Logo e Descrição -->
             <div>
                 <a href="#" class="flex items-center justify-center ">
-                    <img src="{{ asset('assets\imgs\logos\logo_iruycode_principal.png') }}" alt="Logo" class="h-12 w-auto mr-2 my-2">
+                    <img src="{{ asset('assets\imgs\logos\logo_iruycode_principal.png') }}" alt="Logo"
+                        class="h-12 w-auto mr-2 my-2">
                 </a>
-                <p class="text-gray-400">Desenvolvendo soluções com paixão e qualidade. Entre em contato para colaborar em projetos incríveis.</p>
+                <p class="text-gray-400">Desenvolvendo soluções com paixão e qualidade. Entre em contato para colaborar
+                    em projetos incríveis.</p>
             </div>
-    
+
             <!-- Navegação -->
             <div>
                 <h4 class="text-lg font-semibold mb-4">Navegação</h4>
@@ -184,7 +205,7 @@
                     <li><a href="#contactos" class="hover:text-white">Contatos</a></li>
                 </ul>
             </div>
-    
+
             <!-- Redes Sociais -->
             <div>
                 <h4 class="text-lg font-semibold mb-4">Redes Sociais</h4>
@@ -201,12 +222,14 @@
                 </div>
             </div>
         </div>
-    
+
         <!-- Direitos autorais -->
         <div class="mt-10 border-t border-gray-700 pt-6 text-center text-sm text-gray-500">
             &copy; {{ date('Y') }} Minha Empresa. Todos os direitos reservados.
         </div>
     </footer>
+
+    @vite('resources/js/app.js')
 
     <!-- JavaScript para Menu Mobile -->
     <script>
@@ -224,5 +247,35 @@
 
     @yield('scripts')
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/datetime/1.4.1/js/dataTables.dateTime.min.js"></script>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {{-- DataTables --}}
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+    <script>
+        $(document).ready(function() {
+            const table = $('#categoryTable').DataTable({
+                paging: true,
+                responsive: true,
+            });
+
+            $('#typeFilter').on('change', function() {
+                const selected = $(this).val();
+                if (selected === "") {
+                    table.column(0).search('').draw(); // <-- Corrige a coluna
+                } else {
+                    table.column(0).search('^' + selected + '$', true, false).draw();
+                }
+            });
+        });
+    </script>
+
+
 </body>
+
 </html>
