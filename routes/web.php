@@ -48,13 +48,12 @@ Route::prefix('pomodoro-timer')
         Route::post('/tasks', [PomoTimerController::class, 'storeTask'])->name('tasks.store');
 
         Route::post('/sessions', [PomoTimerController::class, 'storeSession'])->name('sessions.store');
-
-        Route::get('/spotify/login', [SpotifyAuthController::class, 'redirectToSpotify'])->name('spotify.login');
-        Route::get('/callback', [SpotifyAuthController::class, 'handleCallback'])->name('spotify.callback');
-        Route::get('/spotify/play', [SpotifyAuthController::class, 'startPlaylist'])->name('spotify.play');
-        Route::get('/spotify/pause', [SpotifyAuthController::class, 'pausePlayback'])->name('spotify.pause');
-
-        Route::get('/spotify/ping', [SpotifyAuthController::class, 'ping'])->name('spotify.ping');
-
-        Route::get('/spotify/token', [SpotifyAuthController::class, 'getClientCredentialsToken'])->name('spotify.token');
     });
+Route::get('/spotify/login', [SpotifyAuthController::class, 'redirectToSpotify'])->name('spotify.login');
+Route::get('/callback', [SpotifyAuthController::class, 'handleCallback'])->name('spotify.callback');
+Route::get('/spotify/play', [SpotifyAuthController::class, 'startPlaylist'])->name('spotify.play');
+Route::get('/spotify/pause', [SpotifyAuthController::class, 'pausePlayback'])->name('spotify.pause');
+
+Route::get('/spotify/ping', [SpotifyAuthController::class, 'ping'])->name('spotify.ping');
+
+Route::get('/spotify/token', [SpotifyAuthController::class, 'getClientCredentialsToken'])->name('spotify.token');
