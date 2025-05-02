@@ -20,9 +20,6 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.4.1/css/dataTables.dateTime.min.css">
 
-
-
-
     <style>
         /* Corrige textos do DataTables no modo escuro */
         .dataTables_wrapper {
@@ -43,7 +40,6 @@
             color: white !important;
         }
     </style>
-
 
 </head>
 
@@ -144,34 +140,22 @@
     </header>
 
     <!-- Pre-loader -->
-    {{-- <div 
-        x-data="{ loading: true, stage: 1 }" 
-        x-init="
-            setTimeout(() => stage = 2, 3000);
-            setTimeout(() => loading = false, 6000);
-        " 
-        class="fixed inset-0 bg-black z-50 flex items-center justify-center"
-        x-show="loading"
-        x-transition:leave="transition-opacity duration-1000"
-        x-transition:leave-start="opacity-100"
+    {{-- <div x-data="{ loading: true, stage: 1 }" x-init="setTimeout(() => stage = 2, 3000);
+    setTimeout(() => loading = false, 6000);"
+        class="fixed inset-0 bg-black z-50 flex items-center justify-center" x-show="loading"
+        x-transition:leave="transition-opacity duration-1000" x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0">
 
         <!-- Estágio 1: small logo responsiva -->
         <template x-if="stage === 1">
-            <img 
-                src="{{ asset('assets/videos/small_logo.gif') }}" 
-                alt="Loading..."
-                class="w-[60vw] md:w-[35vw] lg:w-[25vw] h-auto"
-            >
+            <img src="{{ asset('assets/videos/small_logo.gif') }}" alt="Loading..."
+                class="w-[60vw] md:w-[35vw] lg:w-[25vw] h-auto">
         </template>
 
         <!-- Estágio 2: normal logo responsiva -->
         <template x-if="stage === 2">
-            <img 
-                src="{{ asset('assets/videos/gift_health_meal.gif') }}" 
-                alt="Logo final"
-                class="w-[75vw] md:w-[50vw] lg:w-[35vw] h-auto transition-all duration-1000"
-            >
+            <img src="{{ asset('assets/videos/gift_health_meal.gif') }}" alt="Logo final"
+                class="w-[75vw] md:w-[50vw] lg:w-[35vw] h-auto transition-all duration-1000">
         </template>
     </div> --}}
 

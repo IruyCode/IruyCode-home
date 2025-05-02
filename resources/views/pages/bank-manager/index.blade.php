@@ -1,209 +1,204 @@
 @extends('layouts\template')
 
 @section('content')
-    <div class="flex">
-        <main class="flex-1 px-8 py-6">
-            <h2 class="text-2xl font-bold mb-6 text-gray-100">Página de Gestão de Banco</h2>
+    <div class="container mx-auto px-4 py-8 space-y-10">
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <div class="col-span-1 bg-gray-700 rounded-lg shadow p-6">
-                    <h3 class="text-xl font-bold text-white mb-4">Adicionar Tipo de Operação</h3>
+        <!-- ROW 1: Grid com 2 colunas -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
-                    <form action="{{ route('bank-manager.operation-categories.store') }}" method="POST" class="space-y-4">
-                        @csrf
+            <!-- COLUNA 1: Agrupada com largura fixa e centralizada -->
+            <div class="space-y-6 max-w-xl w-full mx-auto">
 
-                        <div>
-                            <label for="operation_type" class="block text-sm text-gray-300 mb-1">Tipo de Operação</label>
-                            <select id="operation_type" name="operation_type" required
-                                class="w-full rounded bg-gray-800 border border-gray-600 p-2 text-white">
+                <!-- 💰 Saldo Atual -->
+                <div class="bg-gray-900 border-2 border-blue-600 p-6 rounded-lg shadow text-center">
+                    <h3 class="text-lg font-semibold text-gray-400 mb-2">💰 Saldo Atual</h3>
+                    <p
+                        class="text-5xl font-bold 
+                @if ($balance->balance > 0) text-green-400
+                @elseif ($balance->balance < 0) text-red-400
+                @else text-yellow-300 @endif">
+                        € {{ number_format($balance->balance, 2, ',', '.') }}
+                    </p>
+                </div>
+
+                <!--  Tipo de Operação -->
+                <div x-data="{ open: false }" class="bg-gray-800 p-4 rounded-lg shadow">
+                    <button @click="open = !open" class="w-full text-left text-white font-semibold">
+                        ➕ Tipo de Operação
+                    </button>
+                    <div x-show="open" x-transition class="mt-4">
+                        <form action="{{ route('bank-manager.operation-categories.store') }}" method="POST"
+                            class="space-y-4">
+                            @csrf
+                            <select name="operation_type" required
+                                class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white">
                                 <option value="income">Entrada (Income)</option>
                                 <option value="expense">Saída (Expense)</option>
                             </select>
-                        </div>
+                            <input type="text" name="name" placeholder="Nome da Categoria" required
+                                class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white">
+                            <button type="submit"
+                                class="w-full bg-blue-600 hover:bg-blue-700 transition-colors p-3 rounded text-white font-semibold">
+                                Adicionar Categoria
+                            </button>
+                        </form>
+                    </div>
+                </div>
 
-                        <div>
-                            <label for="name" class="block text-sm text-gray-300 mb-1">Nome do Tipo</label>
-                            <input type="text" id="name" name="name" required
-                                class="w-full rounded bg-gray-800 border border-gray-600 p-2 text-white">
-                        </div>
+                <!--  Adicionar Operação -> Aberto -->
+                <div x-data="{ open: true }" class="bg-gray-800 p-4 rounded-lg shadow">
+                    <button @click="open = !open" class="w-full text-left text-white font-semibold">
+                        ➕ Adicionar Operação
+                    </button>
+                    <div x-show="open" x-transition class="mt-4">
+                        <form action="{{ route('bank-manager.transactions.store') }}" method="POST" class="space-y-4"
+                            x-data="bankForm()">
+                            @csrf
+                            <select id="operation_type" name="operation_type" x-model="selectedType"
+                                @change="updateCategories"
+                                class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white">
+                                <option value="">Tipo</option>
+                                <template x-for="type in types" :key="type.id">
+                                    <option :value="type.id" x-text="type.operation_type"></option>
+                                </template>
+                            </select>
+                            <select name="operation_category_id" x-model="selectedCategory"
+                                class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white">
+                                <option value="">Categoria</option>
+                                <template x-for="category in filteredCategories" :key="category.id">
+                                    <option :value="category.id" x-text="category.name"></option>
+                                </template>
+                            </select>
+                            <input type="number" step="0.01" name="amount" placeholder="Valor"
+                                class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white" required>
+                            <button type="submit"
+                                class="w-full bg-green-600 hover:bg-green-700 transition-colors p-3 rounded text-white font-semibold">
+                                Salvar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Grafico de Gestao de Gastos -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+                <h3 class="text-lg font-bold text-white mb-4">📊 Gastos por Categoria</h3>
+
+                <form method="GET" action="{{ route('bank-manager.index') }}" class="flex flex-wrap gap-4 mb-4">
+                    <div>
+                        <label for="start_date" class="text-white text-sm">Data Início</label>
+                        <input type="date" name="start_date" id="start_date"
+                            value="{{ request('start_date') ?? now()->startOfMonth()->toDateString() }}"
+                            class="bg-gray-700 border border-gray-600 text-white rounded px-3 py-2">
+                    </div>
+
+                    <div>
+                        <label for="end_date" class="text-white text-sm">Data Fim</label>
+                        <input type="date" name="end_date" id="end_date"
+                            value="{{ request('end_date') ?? now()->endOfMonth()->toDateString() }}"
+                            class="bg-gray-700 border border-gray-600 text-white rounded px-3 py-2">
+                    </div>
+
+                    <div class="flex items-end">
                         <button type="submit"
-                            class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded text-white font-bold">
-                            Adicionar
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded">
+                            Filtrar
                         </button>
-                    </form>
-                </div>
+                    </div>
+                </form>
+
+                <canvas id="expenseChart" height="200"></canvas>
             </div>
-        </main>
-
-
-        @php
-            $saldo = $balance->balance;
-            $saldoCor = $saldo >= 0 ? 'text-green-400' : 'text-red-400';
-        @endphp
-
-
-
-
-        <div class="mb-6">
-            <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg text-center">
-                <h3 class="text-lg font-semibold text-gray-400 mb-2">Saldo atual</h3>
-                <p class="text-4xl font-bold {{ $saldoCor }}">
-                    € {{ number_format($saldo, 2, ',', '.') }}
-                </p>
-            </div>
-        </div>
-
-        <div class="mt-6">
-            <h3 class="text-lg font-semibold text-gray-300 mb-4">Últimas Transações</h3>
-        
-            <ul class="divide-y divide-gray-700 bg-gray-800 rounded-lg overflow-hidden shadow-md">
-                @forelse ($transactions as $transaction)
-                    @php
-                        $type = $transaction->operationCategory?->operationType?->operation_type ?? 'unknown';
-                        $color = $type === 'income' ? 'text-green-400' : ($type === 'expense' ? 'text-red-400' : 'text-gray-400');
-                    @endphp
-                    <li class="flex justify-between items-center px-5 py-4">
-                        <div>
-                            <p class="font-semibold text-white">
-                                {{ $transaction->operationCategory?->name ?? 'Categoria desconhecida' }}
-                            </p>
-                            <p class="text-sm text-gray-400">
-                                {{ $transaction->created_at->format('d/m/Y H:i') }}
-                            </p>
-                        </div>
-                        <p class="text-xl font-semibold {{ $color }}">
-                            € {{ number_format($transaction->amount, 2, ',', '.') }}
-                        </p>
-                    </li>
-                @empty
-                    <li class="px-5 py-4 text-gray-400 text-sm text-center">Nenhuma transação registrada.</li>
-                @endforelse
-            </ul>
-            
-        </div>
-
-
-        <div x-data="bankForm()" class="bg-gray-800 p-8 rounded-lg shadow-md text-white max-w-md mx-auto">
-            <h2 class="text-2xl font-bold mb-6">Adicionar Operação</h2>
-
-            <form action="{{ route('bank-manager.transactions.store') }}" method="POST" class="space-y-6">
-                @csrf
-
-                <!-- Tipo de Operação -->
-                <div>
-                    <label for="operation_type" class="block mb-2 text-sm font-medium">Tipo de Operação</label>
-                    <select id="operation_type" name="operation_type" x-model="selectedType" @change="updateCategories"
-                        class="w-full rounded-md bg-gray-700 border border-gray-600 p-3">
-                        <option value="">Selecione um tipo</option>
-                        <template x-for="type in types" :key="type.id">
-                            <option :value="type.id" x-text="type.operation_type"></option>
-                        </template>
-                    </select>
-                </div>
-
-                <!-- Categoria -->
-                <div>
-                    <label for="operation_category" class="block mb-2 text-sm font-medium">Categoria</label>
-                    <select id="operation_category" name="operation_category_id" x-model="selectedCategory"
-                        class="w-full rounded-md bg-gray-700 border border-gray-600 p-3">
-                        <option value="">Selecione uma categoria</option>
-                        <template x-for="category in filteredCategories" :key="category.id">
-                            <option :value="category.id" x-text="category.name"></option>
-                        </template>
-                    </select>
-                </div>
-
-                <!-- Valor -->
-                <div>
-                    <label for="amount" class="block mb-2 text-sm font-medium">Valor</label>
-                    <input type="number" id="amount" name="amount" step="0.01" required
-                        class="w-full rounded-md bg-gray-700 border border-gray-600 p-3">
-                </div>
-
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-md font-semibold">
-                    Salvar Operação
-                </button>
-            </form>
 
         </div>
 
-    </div>
 
+        <!-- ROW 2: Tabela -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-bold text-white mb-4 text-center">📜 Últimas Transações</h2>
 
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-2xl font-bold text-white mb-6">Categorias de Operações</h1>
-
-        <div class="mb-4">
-            <label for="typeFilter" class="text-white block mb-1">Filtrar por Tipo</label>
-            <select id="typeFilter" class="w-full md:w-1/3 rounded p-2">
-                <option value="">Todos</option>
-                @foreach ($types as $type)
-                    <option value="{{ $type->operation_type }}">{{ ucfirst($type->operation_type) }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <table id="categoryTable" class="w-full text-sm text-left text-gray-400 bg-gray-800 rounded-lg overflow-hidden">
-            <thead class="bg-gray-700 text-white">
-                <tr>
-                    <th class="px-4 py-2">Tipo</th>
-                    <th class="px-4 py-2">Categoria</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($types as $type)
-                    @foreach ($type->categories as $category)
-                        <tr data-type="{{ $type->operation_type }}">
-                            <td class="px-4 py-2">{{ ucfirst($type->operation_type) }}</td>
-                            <td class="px-4 py-2">{{ $category->name }}</td>
+            <div class="overflow-x-auto">
+                <table id="transactionsTable"
+                    class="min-w-full bg-gray-900 text-white rounded overflow-hidden shadow text-center">
+                    <thead class="bg-gray-700 text-sm uppercase text-gray-300">
+                        <tr>
+                            <th class="px-6 py-3">Categoria</th>
+                            <th class="px-6 py-3">Valor</th>
+                            <th class="px-6 py-3">Data</th>
                         </tr>
-                    @endforeach
-                @endforeach
-            </tbody>
-        </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($transactions as $transaction)
+                            @php
+                                $type = $transaction->operationCategory?->operationType?->operation_type ?? 'unknown';
+                                $color =
+                                    $type === 'income'
+                                        ? 'text-green-400'
+                                        : ($type === 'expense'
+                                            ? 'text-red-400'
+                                            : 'text-gray-400');
+                            @endphp
+                            <tr class="border-t border-gray-700">
+                                <td class="px-6 py-4">{{ $transaction->operationCategory->name ?? 'Sem categoria' }}</td>
+                                <td class="px-6 py-4 font-semibold {{ $color }}">
+                                    € {{ number_format($transaction->amount, 2, ',', '.') }}
+                                </td>
+                                <td class="px-6 py-4">{{ $transaction->created_at->format('d/m/Y') }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+
     </div>
 
-    <div class="mb-4 flex gap-4">
-        <select id="typeFilter" class="p-2 rounded text-black">
-            <option value="">Todos os Tipos</option>
-            <option value="income">Entrada</option>
-            <option value="expense">Saída</option>
-        </select>
-    
-        <input type="text" id="minDate" class="p-2 rounded text-black" placeholder="Data início (yyyy-mm-dd)">
-        <input type="text" id="maxDate" class="p-2 rounded text-black" placeholder="Data fim (yyyy-mm-dd)">
-    </div>
-    
-    <table id="transactionsTable" class="display w-full">
-        <thead>
-            <tr>
-                <th>Categoria</th>
-                <th>Tipo</th>
-                <th>Valor</th>
-                <th>Data</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($transactions as $transaction)
-                @php
-                    $type = $transaction->operationCategory?->operationType?->operation_type ?? 'unknown';
-                    $color = $type === 'income' ? 'text-green-400' : ($type === 'expense' ? 'text-red-400' : 'text-gray-400');
-                @endphp
-                <tr>
-                    <td>{{ $transaction->operationCategory->name ?? 'Sem categoria' }}</td>
-                    <td>{{ $type }}</td>
-                    <td class="{{ $color }}">€ {{ number_format($transaction->amount, 2, ',', '.') }}</td>
-                    <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-    
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+
+            const data = {
+                labels: {!! json_encode($expenseLabels) !!},
+                datasets: [{
+                    label: 'Gastos',
+                    data: {!! json_encode($expenseValues) !!},
+                    backgroundColor: [
+                        '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'
+                    ],
+                    hoverOffset: 8
+                }]
+            };
+
+            const config = {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const percent = ((value / {{ $totalIncome ?: 1 }}) * 100).toFixed(1);
+                                    return `${context.label}: €${value.toFixed(2)} (${percent}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            new Chart(ctx, config);
+        });
+    </script>
 @endsection
 
 
 @section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         function bankForm() {
             return {
@@ -221,29 +216,28 @@
         }
     </script>
 
-<script>
-    let table = $('#transactionsTable').DataTable();
+    <script>
+        let table = $('#transactionsTable').DataTable();
 
-    // Tipo de operação
-    $('#typeFilter').on('change', function () {
-        table.column(1).search(this.value).draw();
-    });
+        // Tipo de operação
+        $('#typeFilter').on('change', function() {
+            table.column(1).search(this.value).draw();
+        });
 
-    // Filtro de datas
-    $.fn.dataTable.ext.search.push(function (settings, data) {
-        let min = $('#minDate').val();
-        let max = $('#maxDate').val();
-        let date = data[3]; // 4ª coluna (Data)
+        // Filtro de datas
+        $.fn.dataTable.ext.search.push(function(settings, data) {
+            let min = $('#minDate').val();
+            let max = $('#maxDate').val();
+            let date = data[3]; // 4ª coluna (Data)
 
-        if ((min === "" || date >= min) && (max === "" || date <= max)) {
-            return true;
-        }
-        return false;
-    });
+            if ((min === "" || date >= min) && (max === "" || date <= max)) {
+                return true;
+            }
+            return false;
+        });
 
-    $('#minDate, #maxDate').on('change', function () {
-        table.draw();
-    });
-</script>
-
+        $('#minDate, #maxDate').on('change', function() {
+            table.draw();
+        });
+    </script>
 @endsection

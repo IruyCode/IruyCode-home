@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+
 use App\Models\AppBankManagerOperationCategory;
 use App\Models\AppBankManagerOperationType;
 use App\Models\AppBankManagerTransaction;
@@ -10,8 +13,9 @@ use App\Models\AppBankManagerAccountBalance;
 
 class BankManagerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+
         $operationTypes = AppBankManagerOperationType::all();
         $operationCategories = AppBankManagerOperationCategory::all();
         $types = AppBankManagerOperationType::with('categories')->get();
@@ -20,11 +24,55 @@ class BankManagerController extends Controller
 
         $transactions = AppBankManagerTransaction::with('operationCategory.operationType')->get();
 
-        // $type = $transactions->operationCategory->operationType->operation_type;
 
-        // dd($transactions);
+        // Total de receitas
+        $totalIncome = AppBankManagerTransaction::whereHas('operationCategory.operationType', function ($q) {
+            $q->where('operation_type', 'income');
+        })->sum('amount');
 
-        return view('pages.bank-manager.index', compact('operationTypes', 'operationCategories', 'types', 'balance', 'transactions'));
+        // Agrupar despesas por categoria
+        $expenseData = AppBankManagerTransaction::whereHas('operationCategory.operationType', function ($q) {
+            $q->where('operation_type', 'expense');
+        })
+            ->with('operationCategory')
+            ->get()
+            ->groupBy('operationCategory.name')
+            ->map(function ($group) {
+                return $group->sum('amount');
+            });
+
+        // Para passar ao Blade
+        $expenseLabels = $expenseData->keys();
+        $expenseValues = $expenseData->values();
+
+
+        $startDate = $request->input('start_date') ?? now()->startOfMonth()->toDateString();
+        $endDate = $request->input('end_date') ?? now()->endOfMonth()->toDateString();
+    
+        $expenses = AppBankManagerTransaction::whereHas('operationCategory.operationType', fn($q) =>
+            $q->where('operation_type', 'expense'))
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->with('operationCategory')
+            ->get();
+    
+        $incomeTotal = AppBankManagerTransaction::whereHas('operationCategory.operationType', fn($q) =>
+            $q->where('operation_type', 'income'))
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('amount');
+    
+        $groupedExpenses = $expenses->groupBy(fn($t) => $t->operationCategory->name ?? 'Sem Categoria');
+    
+        $labels = [];
+        $values = [];
+    
+        foreach ($groupedExpenses as $category => $transactions) {
+            $total = $transactions->sum('amount');
+            $percentage = $incomeTotal > 0 ? ($total / $incomeTotal) * 100 : 0;
+            $labels[] = $category;
+            $values[] = round($percentage, 2);
+        }
+
+        return view('pages.bank-manager.index', compact('operationTypes', 'operationCategories', 'types', 'balance', 'transactions','totalIncome','expenseData','expenseLabels','expenseValues','labels', 'values', 'startDate', 'endDate',));
     }
 
     public function storeOperationCategory(Request $request)
