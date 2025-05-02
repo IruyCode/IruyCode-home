@@ -7,10 +7,12 @@ use App\Http\Controllers\AppHealthMealController;
 use App\Http\Controllers\BankManagerController;
 use App\Http\Controllers\PomoTimerController;
 
+use App\Http\Controllers\SpotifyAuthController;
+
 // Página inicial geral
 Route::get('/', [IruyCodeController::class, 'welcome'])->name('iruycode.welcome');
 
-Route::get('test',[IruyCodeController::class, 'test'])->name('iruycode.test');
+Route::get('test', [IruyCodeController::class, 'test'])->name('iruycode.test');
 
 // Grupo Health Meal
 Route::prefix('health-meal')
@@ -33,7 +35,6 @@ Route::prefix('bank-manager')
         Route::post('/operation-categories', [BankManagerController::class, 'storeOperationCategory'])->name('operation-categories.store');
 
         Route::post('/bank-manager/transactions', [BankManagerController::class, 'storeTransaction'])->name('transactions.store');
-
     });
 
 // Grupo Pomodoro Timer
@@ -41,7 +42,19 @@ Route::prefix('pomodoro-timer')
     ->name('pomodoro-timer.')
     ->group(function () {
         Route::get('/', [PomoTimerController::class, 'index'])->name('index');
+        // Projetos
+        Route::post('/projects', [PomoTimerController::class, 'store'])->name('projects.store');
+        // Tarefas
+        Route::post('/tasks', [PomoTimerController::class, 'storeTask'])->name('tasks.store');
 
-        // Exemplo de rota extra:
-        Route::get('/start', [PomoTimerController::class, 'start'])->name('start');
+        Route::post('/sessions', [PomoTimerController::class, 'storeSession'])->name('sessions.store');
+
+        Route::get('/spotify/login', [SpotifyAuthController::class, 'redirectToSpotify'])->name('spotify.login');
+        Route::get('/callback', [SpotifyAuthController::class, 'handleCallback'])->name('spotify.callback');
+        Route::get('/spotify/play', [SpotifyAuthController::class, 'startPlaylist'])->name('spotify.play');
+        Route::get('/spotify/pause', [SpotifyAuthController::class, 'pausePlayback'])->name('spotify.pause');
+
+        Route::get('/spotify/ping', [SpotifyAuthController::class, 'ping'])->name('spotify.ping');
+
+        Route::get('/spotify/token', [SpotifyAuthController::class, 'getClientCredentialsToken'])->name('spotify.token');
     });
