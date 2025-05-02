@@ -49,6 +49,7 @@ Route::prefix('pomodoro-timer')
 
         Route::post('/sessions', [PomoTimerController::class, 'storeSession'])->name('sessions.store');
     });
+
 Route::get('/spotify/login', [SpotifyAuthController::class, 'redirectToSpotify'])->name('spotify.login');
 Route::get('/callback', [SpotifyAuthController::class, 'handleCallback'])->name('spotify.callback');
 Route::get('/spotify/play', [SpotifyAuthController::class, 'startPlaylist'])->name('spotify.play');
