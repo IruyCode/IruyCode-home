@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
         //Chamada de seeder para o Grupo Bank Manager
          $this->call(BankManagerSeeder::class);
          $this->call(DebtSeeder::class);
+         $this->call(FinancialGoalSeeder::class);
+
 
     }
 }

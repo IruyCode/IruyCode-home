@@ -63,5 +63,9 @@ Route::get('/spotify/token', [SpotifyAuthController::class, 'getClientCredential
 Route::post('/debt-installments/{installment}/mark-as-paid', [BankManagerController::class, 'markInstallmentAsPaid'])
     ->name('debt-installments.markAsPaid');
 
-    Route::post('/debt-installments/{debt}/bulk-pay', [BankManagerController::class, 'bulkMarkInstallmentsAsPaid'])
+Route::post('/debt-installments/{debt}/bulk-pay', [BankManagerController::class, 'bulkMarkInstallmentsAsPaid'])
     ->name('debt-installments.bulkMarkAsPaid');
+
+
+Route::get('/financial-goals/create', [BankManagerController::class, 'createFinancialGoal'])->name('financial-goals.create');
+Route::post('/financial-goals', [BankManagerController::class, 'storeFinancialGoal'])->name('financial-goals.store');

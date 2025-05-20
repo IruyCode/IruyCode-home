@@ -246,9 +246,6 @@
             </div>
         </div>
 
-
-
-
         <!-- ROW 2: Tabela -->
         <div class="bg-gray-800 p-6 rounded-lg shadow-md">
             <h2 class="text-xl font-bold text-white mb-4 text-center">📜 Últimas Transações</h2>
@@ -288,11 +285,87 @@
             </div>
         </div>
 
+        <!-- Form para criar uma nova meta -->
+        <div class="max-w-2xl mx-auto mt-10 bg-white shadow-md rounded p-6">
+            <h2 class="text-2xl font-bold mb-4">🎯 Nova Meta Financeira</h2>
 
+            <form action="{{ route('financial-goals.store') }}" method="POST">
+                @csrf
+
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-700 font-medium mb-2">Nome da Meta</label>
+                    <input type="text" name="name" id="name" required
+                        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="block text-gray-700 font-medium mb-2">Descrição</label>
+                    <textarea name="description" id="description" rows="3"
+                        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label for="target_amount" class="block text-gray-700 font-medium mb-2">Valor Objetivo (€)</label>
+                    <input type="number" name="target_amount" id="target_amount" step="0.01" required
+                        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="mb-4">
+                    <label for="deadline" class="block text-gray-700 font-medium mb-2">Data Limite</label>
+                    <input type="date" name="deadline" id="deadline" required
+                        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <button type="submit"
+                    class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded w-full">
+                    Salvar Meta
+                </button>
+            </form>
+        </div>
+
+
+        <div class="max-w-4xl mx-auto mt-10 bg-white shadow-md rounded p-6">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">🎯 Metas Financeiras</h2>
+
+            @foreach ($goals as $goal)
+                @php
+                    $percentage = $goal->target_amount > 0 ? ($goal->current_amount / $goal->target_amount) * 100 : 0;
+                    $remaining = $goal->target_amount - $goal->current_amount;
+                @endphp
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-900">{{ $goal->name }}</h3>
+                    <p class="text-sm text-gray-600">{{ $goal->description }}</p>
+                    <p class="mt-1 text-gray-700">
+                        💰 Meta: <strong>€{{ number_format($goal->target_amount, 2) }}</strong><br>
+                        📆 Prazo: <strong>{{ \Carbon\Carbon::parse($goal->deadline)->format('d/m/Y') }}</strong><br>
+                        📈 Progresso: <strong>€{{ number_format($goal->current_amount, 2) }}
+                            ({{ number_format($percentage, 1) }}%)
+                        </strong><br>
+                        🧮 Faltam: <strong>€{{ number_format($remaining, 2) }}</strong>
+                    </p>
+
+                    <div class="w-full bg-gray-300 rounded h-4 mt-2">
+                        <div class="bg-green-600 h-4 rounded" style="width: {{ min($percentage, 100) }}%"></div>
+                    </div>
+                </div>
+            @endforeach
+
+            @if ($goals->isEmpty())
+                <p class="text-gray-500">Nenhuma meta definida ainda.</p>
+            @endif
+        </div>
 
 
 
     </div>
+
+
+
+
+
+
+
 
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 

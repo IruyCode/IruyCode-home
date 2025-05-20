@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AppBankManagerDebt;
 use App\Models\AppBankManagerDebtInstallment;
+use App\Models\AppBankManagerFinancialGoal;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -27,6 +28,8 @@ class BankManagerController extends Controller
         $transactions = AppBankManagerTransaction::with('operationCategory.operationType')->get();
 
         $debts = AppBankManagerDebt::with('installmentsList')->get();
+
+        $goals = AppBankManagerFinancialGoal::all();
 
         // Total de receitas
         $totalIncome = AppBankManagerTransaction::whereHas('operationCategory.operationType', function ($q) {
@@ -75,7 +78,8 @@ class BankManagerController extends Controller
             $values[] = round($percentage, 2);
         }
 
-        return view('pages.bank-manager.index', compact('operationTypes', 'operationCategories', 'types', 'balance', 'transactions', 'totalIncome', 'expenseData', 'expenseLabels', 'expenseValues', 'labels', 'values', 'startDate', 'endDate', 'debts'));
+        $goals = AppBankManagerFinancialGoal::all();
+        return view('pages.bank-manager.index', compact('operationTypes', 'operationCategories', 'types', 'balance', 'transactions', 'totalIncome', 'expenseData', 'expenseLabels', 'expenseValues', 'labels', 'values', 'startDate', 'endDate', 'debts','goals'));
     }
 
     public function storeOperationCategory(Request $request)
@@ -162,6 +166,26 @@ class BankManagerController extends Controller
         foreach ($toMark as $installment) {
             $installment->update(['paid_at' => now()]);
         }
+
+        return redirect()->back()->with('success', 'Parcelas pagas com sucesso!');
+    }
+
+    public function storeFinancialGoal(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'target_amount' => 'required|numeric|min:0.01',
+            'deadline' => 'required|date|after:today',
+        ]);
+
+        AppBankManagerFinancialGoal::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'target_amount' => $request->target_amount,
+            'current_amount' => 0,
+            'deadline' => $request->deadline,
+        ]);
 
         return redirect()->back()->with('success', 'Parcelas pagas com sucesso!');
     }
