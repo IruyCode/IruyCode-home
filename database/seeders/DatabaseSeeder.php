@@ -19,5 +19,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        //Chamada de seeder para o Grupo Bank Manager
+         $this->call(BankManagerSeeder::class);
     }
 }

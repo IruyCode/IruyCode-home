@@ -1,4 +1,4 @@
-@extends('layouts\template')
+@extends('layouts/template')
 
 @section('content')
     <div class="container mx-auto px-4 py-8 space-y-10">
