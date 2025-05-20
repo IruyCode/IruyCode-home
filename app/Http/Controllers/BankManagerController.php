@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\AppBankManagerDebt;
+use App\Models\AppBankManagerDebtInstallment;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -24,6 +26,7 @@ class BankManagerController extends Controller
 
         $transactions = AppBankManagerTransaction::with('operationCategory.operationType')->get();
 
+        $debts = AppBankManagerDebt::with('installmentsList')->get();
 
         // Total de receitas
         $totalIncome = AppBankManagerTransaction::whereHas('operationCategory.operationType', function ($q) {
@@ -48,23 +51,23 @@ class BankManagerController extends Controller
 
         $startDate = $request->input('start_date') ?? now()->startOfMonth()->toDateString();
         $endDate = $request->input('end_date') ?? now()->endOfMonth()->toDateString();
-    
+
         $expenses = AppBankManagerTransaction::whereHas('operationCategory.operationType', fn($q) =>
             $q->where('operation_type', 'expense'))
             ->whereBetween('created_at', [$startDate, $endDate])
             ->with('operationCategory')
             ->get();
-    
+
         $incomeTotal = AppBankManagerTransaction::whereHas('operationCategory.operationType', fn($q) =>
             $q->where('operation_type', 'income'))
             ->whereBetween('created_at', [$startDate, $endDate])
             ->sum('amount');
-    
+
         $groupedExpenses = $expenses->groupBy(fn($t) => $t->operationCategory->name ?? 'Sem Categoria');
-    
+
         $labels = [];
         $values = [];
-    
+
         foreach ($groupedExpenses as $category => $transactions) {
             $total = $transactions->sum('amount');
             $percentage = $incomeTotal > 0 ? ($total / $incomeTotal) * 100 : 0;
@@ -72,7 +75,7 @@ class BankManagerController extends Controller
             $values[] = round($percentage, 2);
         }
 
-        return view('pages.bank-manager.index', compact('operationTypes', 'operationCategories', 'types', 'balance', 'transactions','totalIncome','expenseData','expenseLabels','expenseValues','labels', 'values', 'startDate', 'endDate',));
+        return view('pages.bank-manager.index', compact('operationTypes', 'operationCategories', 'types', 'balance', 'transactions', 'totalIncome', 'expenseData', 'expenseLabels', 'expenseValues', 'labels', 'values', 'startDate', 'endDate', 'debts'));
     }
 
     public function storeOperationCategory(Request $request)
@@ -129,4 +132,38 @@ class BankManagerController extends Controller
 
         return redirect()->back()->with('success', 'Transação registrada com sucesso!');
     }
+
+    public function markInstallmentAsPaid($id, Request $request)
+    {
+        $installment = AppBankManagerDebtInstallment::findOrFail($id);
+
+        // Marcar como pago
+        $installment->paid_at = now();
+        $installment->save();
+
+        return redirect()->back()->with('success', 'Parcela marcada como paga!');
+    }
+
+
+    public function bulkMarkInstallmentsAsPaid(Request $request, $debtId)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $debt = AppBankManagerDebt::with([
+            'installmentsList' => function ($query) {
+                $query->whereNull('paid_at')->orderBy('due_date');
+            }
+        ])->findOrFail($debtId);
+
+        $toMark = $debt->installmentsList->take($request->quantity);
+
+        foreach ($toMark as $installment) {
+            $installment->update(['paid_at' => now()]);
+        }
+
+        return redirect()->back()->with('success', 'Parcelas pagas com sucesso!');
+    }
+
 }

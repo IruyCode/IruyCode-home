@@ -112,6 +112,142 @@
 
         </div>
 
+        <div x-data="{ open: false }" class="max-w-4xl mx-auto mt-10 bg-white shadow-md rounded p-6">
+            <!-- Botão sempre visível -->
+            <button @click="open = !open"
+                class="w-full text-left text-white font-semibold bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+                📊 Dashboard das Dívidas
+            </button>
+            <div x-show="open" x-transition class="mt-4">
+                <!--Dashboard das Dívidas-->
+                <div class="max-w-4xl mx-auto mt-10 bg-white shadow-md rounded p-6">
+                    <h2 class="text-2xl font-bold mb-4">💳 Dívidas Parceladas</h2>
+
+                    @foreach ($debts as $debt)
+                        <div class="mb-6 border-b pb-4">
+                            <h3 class="text-xl font-semibold">{{ $debt->name }}</h3>
+                            <p class="text-gray-600">{{ $debt->description }}</p>
+                            <p><strong>Total:</strong> R$ {{ number_format($debt->total_amount, 2, ',', '.') }} |
+                                <strong>Parcelas:</strong> {{ $debt->installments }}x
+                            </p>
+
+                            <table class="w-full mt-3 text-sm border">
+                                <thead>
+                                    <tr class="bg-gray-100 text-left">
+                                        <th class="p-2">#</th>
+                                        <th class="p-2">Valor</th>
+                                        <th class="p-2">Vencimento</th>
+                                        <th class="p-2">Status</th>
+                                        <th class="p-2">Pago em</th>
+                                        <th class="p-2">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+
+                                    @foreach ($debt->installmentsList as $installment)
+                                        <tr class="border-t">
+                                            <td class="p-2">{{ $installment->installment_number }}</td>
+                                            <td class="p-2">R$ {{ number_format($installment->amount, 2, ',', '.') }}
+                                            </td>
+                                            <td class="p-2">
+                                                {{ \Carbon\Carbon::parse($installment->due_date)->format('d/m/Y') }}
+                                            </td>
+                                            <td class="p-2">
+                                                @if ($installment->paid_at)
+                                                    <span class="text-green-600 font-bold">Pago</span>
+                                                @else
+                                                    <span class="text-red-600 font-bold">Pendente</span>
+                                                @endif
+                                            </td>
+                                            <td class="p-2">
+                                                @if ($installment->paid_at)
+                                                    {{ \Carbon\Carbon::parse($installment->paid_at)->format('d/m/Y') }}
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
+                                            <td class="p-2">
+                                                @if (!$installment->paid_at)
+                                                    <form
+                                                        action="{{ route('debt-installments.markAsPaid', $installment->id) }}"
+                                                        method="POST">
+                                                        @csrf
+                                                        <button
+                                                            class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">Marcar
+                                                            como pago</button>
+                                                    </form>
+                                                @else
+                                                    <span class="text-gray-500">-</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endforeach
+                </div>
+                <!-- Tabela de Dívidas-->
+                <div class="container mx-auto py-6">
+                    <h2 class="text-2xl font-semibold mb-4">Gestão de Dívidas</h2>
+
+                    <table id="debt-table" class="table-auto w-full border bg-white text-sm">
+                        <thead class="bg-gray-200">
+                            <tr>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Total</th>
+                                <th>Parcelas Totais</th>
+                                <th>Pagas</th>
+                                <th>Pendentes</th>
+                                <th>Total Pago</th>
+                                <th>Valor Restante</th>
+                                <th>Parcelas a Pagar</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($debts as $debt)
+                                @php
+                                    $paidInstallments = $debt->installmentsList->whereNotNull('paid_at');
+                                    $pendingInstallments = $debt->installmentsList->whereNull('paid_at');
+                                    $amountPaid = $paidInstallments->sum('amount');
+                                @endphp
+                                <tr class="border-b">
+                                    <td>{{ $debt->name }}</td>
+                                    <td>{{ $debt->description }}</td>
+                                    <td>€ {{ number_format($debt->total_amount, 2) }}</td>
+                                    <td>{{ $debt->installmentsList->count() }}</td>
+                                    <td>{{ $paidInstallments->count() }}</td>
+                                    <td>{{ $pendingInstallments->count() }}</td>
+                                    <td>€ {{ number_format($amountPaid, 2) }}</td>
+                                    <td>€ {{ number_format($debt->total_amount - $amountPaid, 2) }}</td>
+                                    <td>
+                                        <form action="{{ route('debt-installments.bulkMarkAsPaid', $debt->id) }}"
+                                            method="POST" class="flex space-x-2">
+                                            @csrf
+                                            <input type="number" name="quantity" min="1"
+                                                max="{{ $pendingInstallments->count() }}"
+                                                class="border px-2 py-1 rounded w-16 text-sm" placeholder="0" required>
+                                    </td>
+                                    <td>
+                                        <button type="submit"
+                                            class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-white text-sm">
+                                            Pagar
+                                        </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
 
         <!-- ROW 2: Tabela -->
         <div class="bg-gray-800 p-6 rounded-lg shadow-md">
@@ -139,7 +275,8 @@
                                             : 'text-gray-400');
                             @endphp
                             <tr class="border-t border-gray-700">
-                                <td class="px-6 py-4">{{ $transaction->operationCategory->name ?? 'Sem categoria' }}</td>
+                                <td class="px-6 py-4">{{ $transaction->operationCategory->name ?? 'Sem categoria' }}
+                                </td>
                                 <td class="px-6 py-4 font-semibold {{ $color }}">
                                     € {{ number_format($transaction->amount, 2, ',', '.') }}
                                 </td>
@@ -153,7 +290,24 @@
 
 
 
+
+
     </div>
+
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#debt-table').DataTable({
+                responsive: true,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-PT.json'
+                }
+            });
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
 
     <script>

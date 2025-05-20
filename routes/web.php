@@ -58,3 +58,10 @@ Route::get('/spotify/pause', [SpotifyAuthController::class, 'pausePlayback'])->n
 Route::get('/spotify/ping', [SpotifyAuthController::class, 'ping'])->name('spotify.ping');
 
 Route::get('/spotify/token', [SpotifyAuthController::class, 'getClientCredentialsToken'])->name('spotify.token');
+
+
+Route::post('/debt-installments/{installment}/mark-as-paid', [BankManagerController::class, 'markInstallmentAsPaid'])
+    ->name('debt-installments.markAsPaid');
+
+    Route::post('/debt-installments/{debt}/bulk-pay', [BankManagerController::class, 'bulkMarkInstallmentsAsPaid'])
+    ->name('debt-installments.bulkMarkAsPaid');
