@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AppBankManagerDebt;
 use App\Models\AppBankManagerDebtInstallment;
+use App\Models\AppBankManagerDebtor;
 use App\Models\AppBankManagerFinancialGoal;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -13,6 +14,7 @@ use App\Models\AppBankManagerOperationCategory;
 use App\Models\AppBankManagerOperationType;
 use App\Models\AppBankManagerTransaction;
 use App\Models\AppBankManagerAccountBalance;
+use App\Models\AppBankManagerDebtorEdit;
 
 class BankManagerController extends Controller
 {
@@ -30,6 +32,9 @@ class BankManagerController extends Controller
         $debts = AppBankManagerDebt::with('installmentsList')->get();
 
         $goals = AppBankManagerFinancialGoal::all();
+
+        $debtors = AppBankManagerDebtor::with('edits')->get();
+
 
         // Total de receitas
         $totalIncome = AppBankManagerTransaction::whereHas('operationCategory.operationType', function ($q) {
@@ -79,7 +84,7 @@ class BankManagerController extends Controller
         }
 
         $goals = AppBankManagerFinancialGoal::all();
-        return view('pages.bank-manager.index', compact('operationTypes', 'operationCategories', 'types', 'balance', 'transactions', 'totalIncome', 'expenseData', 'expenseLabels', 'expenseValues', 'labels', 'values', 'startDate', 'endDate', 'debts','goals'));
+        return view('pages.bank-manager.index', compact('operationTypes', 'operationCategories', 'types', 'balance', 'transactions', 'totalIncome', 'expenseData', 'expenseLabels', 'expenseValues', 'labels', 'values', 'startDate', 'endDate', 'debts', 'goals', 'debtors'));
     }
 
     public function storeOperationCategory(Request $request)
@@ -189,5 +194,55 @@ class BankManagerController extends Controller
 
         return redirect()->back()->with('success', 'Parcelas pagas com sucesso!');
     }
+
+
+    public function editDebtor($id)
+    {
+        $debtor = AppBankManagerDebtor::findOrFail($id);
+        return view('bank_manager.debtors.edit', compact('debtor'));
+    }
+
+    public function updateDebtor(Request $request, $id)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'current_due_date' => 'required|date',
+            'reason' => 'required|string|max:255',
+        ]);
+
+        $debtor = AppBankManagerDebtor::findOrFail($id);
+        
+        
+
+        // Salva histórico de edição
+        AppBankManagerDebtorEdit::create([
+            'debtor_id' => $debtor->id,
+            'old_amount' => $debtor->amount,
+            'new_amount' => $request->amount,
+            'old_due_date' => $debtor->current_due_date,
+            'new_due_date' => $request->current_due_date,
+            'reason' => $request->reason,
+        ]);
+
+        // Atualiza o devedor
+        $debtor->update([
+            'amount' => $request->amount,
+            'current_due_date' => $request->current_due_date,
+        ]);
+
+        return redirect()->route('debtors.index')->with('success', 'Devedor atualizado com sucesso.');
+    }
+
+    public function markDebtorAsPaid($id)
+    {
+        $debtor = AppBankManagerDebtor::findOrFail($id);
+        $debtor->is_paid = true;
+        $debtor->paid_at = now();
+        $debtor->save();
+
+        return redirect()->route('debtors.index')->with('success', 'Pagamento marcado como recebido.');
+    }
+
+
 
 }

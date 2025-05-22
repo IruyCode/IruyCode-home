@@ -1,6 +1,7 @@
 @extends('layouts/template')
 
 @section('content')
+
     <div class="container mx-auto px-4 py-8 space-y-10">
 
         <!-- ROW 1: Grid com 2 colunas -->
@@ -112,6 +113,49 @@
 
         </div>
 
+        <!-- ROW 2: Tabela -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-bold text-white mb-4 text-center">📜 Últimas Transações</h2>
+
+            <div class="overflow-x-auto">
+                <table id="transactionsTable"
+                    class="min-w-full bg-gray-900 text-white rounded overflow-hidden shadow text-center">
+                    <thead class="bg-gray-700 text-sm uppercase text-gray-300">
+                        <tr>
+                            <th class="px-6 py-3">Categoria</th>
+                            <th class="px-6 py-3">Valor</th>
+                            <th class="px-6 py-3">Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($transactions as $transaction)
+                            @php
+                                $type = $transaction->operationCategory?->operationType?->operation_type ?? 'unknown';
+                                $color =
+                                    $type === 'income'
+                                        ? 'text-green-400'
+                                        : ($type === 'expense'
+                                            ? 'text-red-400'
+                                            : 'text-gray-400');
+                            @endphp
+                            <tr class="border-t border-gray-700">
+                                <td class="px-6 py-4">{{ $transaction->operationCategory->name ?? 'Sem categoria' }}
+                                </td>
+                                <td class="px-6 py-4 font-semibold {{ $color }}">
+                                    € {{ number_format($transaction->amount, 2, ',', '.') }}
+                                </td>
+                                <td class="px-6 py-4">{{ $transaction->created_at->format('d/m/Y') }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+
+
+        <!-- Dashboard das Dívidas -->
         <div x-data="{ open: false }" class="max-w-4xl mx-auto mt-10 bg-white shadow-md rounded p-6">
             <!-- Botão sempre visível -->
             <button @click="open = !open"
@@ -246,44 +290,120 @@
             </div>
         </div>
 
-        <!-- ROW 2: Tabela -->
-        <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-            <h2 class="text-xl font-bold text-white mb-4 text-center">📜 Últimas Transações</h2>
+        <div class="container mx-auto px-4 py-6">
+            <h1 class="text-2xl font-bold mb-6">📥 Gestão de Devedores</h1>
 
-            <div class="overflow-x-auto">
-                <table id="transactionsTable"
-                    class="min-w-full bg-gray-900 text-white rounded overflow-hidden shadow text-center">
-                    <thead class="bg-gray-700 text-sm uppercase text-gray-300">
-                        <tr>
-                            <th class="px-6 py-3">Categoria</th>
-                            <th class="px-6 py-3">Valor</th>
-                            <th class="px-6 py-3">Data</th>
+            <table class="w-full table-auto border text-sm bg-white">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-3 py-2">Nome</th>
+                        <th class="px-3 py-2">Descrição</th>
+                        <th class="px-3 py-2">Valor</th>
+                        <th class="px-3 py-2">Data Original</th>
+                        {{-- <th class="px-3 py-2">Data Atual</th> --}}
+                        {{-- <th class="px-3 py-2">Histórico</th> --}}
+                        {{-- <th class="px-3 py-2">Status</th> --}}
+                        {{-- <th class="px-3 py-2">Ações</th> --}}
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {{-- @dd($debtors); --}}
+                    @foreach ($debtors as $debtor)
+                        <tr class="border-b">
+                            <td class="px-3 py-2">{{ $debtor->name }}</td>
+                            <td class="px-3 py-2">{{ $debtor->description }}</td>
+                            <td class="px-3 py-2">€ {{ number_format($debtor->amount, 2, ',', '.') }}</td>
+                            <td class="px-3 py-2">{{ \Carbon\Carbon::parse($debtor->due_date)->format('d/m/Y') }}
+                            </td>
+                            {{-- <td class="px-3 py-2">{{ \Carbon\Carbon::parse($debtor->edits->new_due_date)->format('d/m/Y') }}
+                            </td> --}}
+                            {{-- <td class="px-3 py-2">
+                                @if ($debtor->edits->count())
+                                    <ul class="list-disc ml-5 text-xs text-gray-700">
+                                        @foreach ($debtor->edits as $edit)
+                                            <li>
+                                                {{ $edit->reason }} ({{ $edit->updated_at->format('d/m/Y') }})
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <span class="text-gray-400 italic">Nenhuma alteração</span>
+                                @endif
+                            </td> --}}
+                            {{-- <td class="px-3 py-2">
+                                @if ($debtor->is_paid)
+                                    <span class="text-green-600 font-bold">Recebido</span>
+                                @else
+                                    <span class="text-red-600 font-bold">Pendente</span>
+                                @endif
+                            </td> --}}
+                            {{-- <td class="px-3 py-2 space-y-2">
+                                @if (!$debtor->is_paid)
+                                    <!-- Form editar -->
+                                    <form action="{{ route('debtors.edit', $debtor->id) }}" method="GET">
+                                        <button type="submit"
+                                            class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded text-xs">Editar</button>
+                                    </form>
+
+                                    <!-- Form marcar como recebido -->
+                                    <form action="{{ route('debtors.markAsPaid', $debtor->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit"
+                                            class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs">Receber</button>
+                                    </form>
+                                @else
+                                    <span class="text-gray-400 text-xs italic">Ações desabilitadas</span>
+                                @endif --}}
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($transactions as $transaction)
-                            @php
-                                $type = $transaction->operationCategory?->operationType?->operation_type ?? 'unknown';
-                                $color =
-                                    $type === 'income'
-                                        ? 'text-green-400'
-                                        : ($type === 'expense'
-                                            ? 'text-red-400'
-                                            : 'text-gray-400');
-                            @endphp
-                            <tr class="border-t border-gray-700">
-                                <td class="px-6 py-4">{{ $transaction->operationCategory->name ?? 'Sem categoria' }}
-                                </td>
-                                <td class="px-6 py-4 font-semibold {{ $color }}">
-                                    € {{ number_format($transaction->amount, 2, ',', '.') }}
-                                </td>
-                                <td class="px-6 py-4">{{ $transaction->created_at->format('d/m/Y') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
+
+
+        {{-- <div class="max-w-xl mx-auto mt-10 bg-white p-6 shadow rounded">
+            <h2 class="text-xl font-bold mb-4">✏️ Editar Devedor</h2>
+
+            <form action="{{ route('debtors.update', $debtor->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="mb-4">
+                    <label class="block font-semibold">Nome:</label>
+                    <input type="text" name="name" value="{{ $debtor->name }}"
+                        class="w-full border p-2 rounded bg-gray-100" readonly>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block font-semibold">Novo Valor (€):</label>
+                    <input type="number" step="0.01" name="amount" value="{{ $debtor->amount }}"
+                        class="w-full border p-2 rounded" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block font-semibold">Nova Data Prevista:</label>
+                    <input type="date" name="current_due_date"
+                        value="{{ $debtor->current_due_date->format('Y-m-d') }}" class="w-full border p-2 rounded"
+                        required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block font-semibold">Motivo da Alteração:</label>
+                    <textarea name="reason" class="w-full border p-2 rounded" required></textarea>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="{{ route('debtors.index') }}" class="text-gray-500 hover:underline">← Cancelar</a>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                        Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div> --}}
+
+
 
         <!-- Form para criar uma nova meta -->
         <div class="max-w-2xl mx-auto mt-10 bg-white shadow-md rounded p-6">

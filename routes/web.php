@@ -35,6 +35,11 @@ Route::prefix('bank-manager')
         Route::post('/operation-categories', [BankManagerController::class, 'storeOperationCategory'])->name('operation-categories.store');
 
         Route::post('/bank-manager/transactions', [BankManagerController::class, 'storeTransaction'])->name('transactions.store');
+
+
+        Route::get('/teste-banco', function () {
+            return view('pages.bank-manager.testebank');
+        });
     });
 
 // Grupo Pomodoro Timer
@@ -69,3 +74,11 @@ Route::post('/debt-installments/{debt}/bulk-pay', [BankManagerController::class,
 
 Route::get('/financial-goals/create', [BankManagerController::class, 'createFinancialGoal'])->name('financial-goals.create');
 Route::post('/financial-goals', [BankManagerController::class, 'storeFinancialGoal'])->name('financial-goals.store');
+
+Route::prefix('bank-manager')->group(function () {
+    Route::get('/debtors', [BankManagerController::class, 'listDebtors'])->name('debtors.index');
+    Route::get('/debtors/{id}/edit', [BankManagerController::class, 'editDebtor'])->name('debtors.edit');
+    Route::post('/debtors/{id}/paid', [BankManagerController::class, 'markDebtorAsPaid'])->name('debtors.markAsPaid');
+    Route::put('/debtors/{id}', [BankManagerController::class, 'updateDebtor'])->name('debtors.update');
+
+});

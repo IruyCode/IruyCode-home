@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
          $this->call(BankManagerSeeder::class);
          $this->call(DebtSeeder::class);
          $this->call(FinancialGoalSeeder::class);
+         $this->call(BankManagerDebtorSeeder::class);
 
 
     }
