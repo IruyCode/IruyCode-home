@@ -14,6 +14,14 @@ Route::get('/', [IruyCodeController::class, 'welcome'])->name('iruycode.welcome'
 
 Route::get('test', [IruyCodeController::class, 'test'])->name('iruycode.test');
 
+Route::get('template', function () {
+    return view('layouts.realTemplate');
+});
+
+
+
+
+
 // Grupo Health Meal
 Route::prefix('health-meal')
     ->name('health-meal.')

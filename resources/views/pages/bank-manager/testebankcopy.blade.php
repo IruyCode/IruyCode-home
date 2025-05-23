@@ -1,12 +1,9 @@
 @extends('layouts.template')
 
 @section('content')
-
-<!-- Div principal -->
-<div class="min-h-screen flex flex-col md:flex-row" >
-
+<div class="min-h-screen flex flex-col md:flex-row bg-[#0a2a5c]">
     <!-- Sidebar Desktop -->
-    <aside class="hidden md:flex md:flex-col bg-black shadow-lg p-4 rounded-xl m-4 w-56 min-w-max max-w-xs" >
+    <aside class="hidden md:flex md:flex-col bg-black shadow-lg p-4 rounded-xl m-4 w-56 min-w-max max-w-xs">
         <div class="flex items-center space-x-3 mb-6">
             <img src="https://via.placeholder.com/40" alt="Avatar" class="rounded-full w-10 h-10" />
             <span class="font-bold text-lg text-white">Olá, Usuário</span>
@@ -57,9 +54,9 @@
     </aside>
 
     <!-- Conteúdo principal -->
-    <div class="flex-1 flex flex-col min-h-screen px-[2%] mt-4" >
+    <div class="flex-1 flex flex-col min-h-screen">
         <!-- Top bar -->
-        <div class="flex justify-between items-center px-0 py-2 border-b bg-black rounded-tr-xl rounded-tl-xl md:sticky md:top-0 md:z-20 w-full pl-4 relative z-20">
+        <div class="flex justify-between items-center px-4 py-2 border-b bg-black rounded-tr-xl rounded-tl-xl md:sticky md:top-0 md:z-10 w-full mx-auto md:mx-6">
             <div class="flex items-center space-x-3 md:hidden">
                 <img src="https://via.placeholder.com/32" alt="Avatar" class="rounded-full" />
                 <span class="font-bold text-white">Olá, Usuário</span>
@@ -68,8 +65,8 @@
         </div>
 
         <!-- Saldo e Receitas/Despesas -->
-        <div class="w-full px-0 py-6 md:py-8 bg-black rounded-xl shadow md:shadow-lg pl-4 -mt-6 relative z-10">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between pt-8">
+        <div class="w-full mx-auto md:mx-6 px-2 md:px-6 py-6 md:py-8 bg-black rounded-xl shadow md:shadow-lg mt-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="text-center md:text-left md:w-1/3">
                     <p class="text-gray-400 text-sm">Saldo</p>
                     <h1 class="text-3xl font-bold text-white">R$ 5.480,35</h1>
@@ -100,7 +97,7 @@
         </div>
 
         <!-- Tabela de Transações -->
-        <div class="w-full px-0 py-8 flex-1"  >
+        <div class="w-full mx-auto md:mx-6 px-2 md:px-6 py-8 flex-1">
             <div class="bg-black rounded-xl shadow p-4">
                 <h2 class="text-md font-semibold mb-4 text-white">Transações do Mês</h2>
                 <div class="overflow-x-auto">
@@ -140,50 +137,4 @@
         </div>
     </div>
 </div>
-<!-- Fim do Div principal -->
-
-<!-- Footer de navegação estilo app (só mobile) -->
-<div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md flex items-center h-16 z-50 md:hidden px-0">
-    <a href="#" class="flex flex-col items-center justify-center flex-1 text-blue-600 text-xs font-semibold py-1">
-        <!-- Ícone de alvo/metas -->
-        <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
-            <circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none" />
-            <circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2" fill="none" />
-        </svg>
-        Metas
-    </a>
-    <a href="#" class="flex flex-col items-center justify-center flex-1 text-gray-700 text-xs py-1">
-        <!-- Ícone de dívidas (cifrão) -->
-        <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M12 8c-2.21 0-4 1.343-4 3s1.79 3 4 3 4 1.343 4 3-1.79 3-4 3" />
-            <path d="M12 2v20" />
-        </svg>
-        Dívidas
-    </a>
-    <!-- Botão central flutuante -->
-    <div class="relative flex-1 flex flex-col items-center justify-center">
-        <button class="bg-blue-600 text-white rounded-full w-16 h-16 shadow-lg border-4 border-white flex items-center justify-center text-3xl absolute -top-10 left-1/2 -translate-x-1/2 z-10">+</button>
-    </div>
-    <a href="#" class="flex flex-col items-center justify-center flex-1 text-gray-700 text-xs py-1">
-        <!-- Ícone de devedores (pessoas) -->
-        <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="9" cy="7" r="4" />
-            <path d="M17 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-            <path d="M2 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
-            <path d="M17 21v-2a4 4 0 0 0-3-3.87" />
-        </svg>
-        Devedores
-    </a>
-    <a href="#" class="flex flex-col items-center justify-center flex-1 text-gray-700 text-xs py-1">
-        <!-- Ícone de configuração (engrenagem) -->
-        <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09A1.65 1.65 0 0 0 9 3.09V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-        </svg>
-        Configuração
-    </a>
-</div>
-<!-- ./Footer de navegação -->
-
 @endsection
