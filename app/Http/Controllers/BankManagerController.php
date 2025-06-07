@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\AppBankManagerDebt;
 use App\Models\AppBankManagerDebtInstallment;
 use App\Models\AppBankManagerDebtor;
@@ -20,7 +19,6 @@ class BankManagerController extends Controller
 {
     public function index(Request $request)
     {
-
         $operationTypes = AppBankManagerOperationType::all();
         $operationCategories = AppBankManagerOperationCategory::all();
         $types = AppBankManagerOperationType::with('categories')->get();
@@ -34,7 +32,6 @@ class BankManagerController extends Controller
         $goals = AppBankManagerFinancialGoal::all();
 
         $debtors = AppBankManagerDebtor::with('edits')->get();
-
 
         // Total de receitas
         $totalIncome = AppBankManagerTransaction::whereHas('operationCategory.operationType', function ($q) {
@@ -56,18 +53,15 @@ class BankManagerController extends Controller
         $expenseLabels = $expenseData->keys();
         $expenseValues = $expenseData->values();
 
-
         $startDate = $request->input('start_date') ?? now()->startOfMonth()->toDateString();
         $endDate = $request->input('end_date') ?? now()->endOfMonth()->toDateString();
 
-        $expenses = AppBankManagerTransaction::whereHas('operationCategory.operationType', fn($q) =>
-            $q->where('operation_type', 'expense'))
+        $expenses = AppBankManagerTransaction::whereHas('operationCategory.operationType', fn($q) => $q->where('operation_type', 'expense'))
             ->whereBetween('created_at', [$startDate, $endDate])
             ->with('operationCategory')
             ->get();
 
-        $incomeTotal = AppBankManagerTransaction::whereHas('operationCategory.operationType', fn($q) =>
-            $q->where('operation_type', 'income'))
+        $incomeTotal = AppBankManagerTransaction::whereHas('operationCategory.operationType', fn($q) => $q->where('operation_type', 'income'))
             ->whereBetween('created_at', [$startDate, $endDate])
             ->sum('amount');
 
@@ -87,6 +81,29 @@ class BankManagerController extends Controller
         return view('pages.bank-manager.index', compact('operationTypes', 'operationCategories', 'types', 'balance', 'transactions', 'totalIncome', 'expenseData', 'expenseLabels', 'expenseValues', 'labels', 'values', 'startDate', 'endDate', 'debts', 'goals', 'debtors'));
     }
 
+    public function indexnew()
+
+    {  
+        // Total de receitas
+        $totalIncome = AppBankManagerTransaction::whereHas('operationCategory.operationType', function ($q) {
+            $q->where('operation_type', 'income');
+        })->sum('amount');
+        // Agrupar despesas por categoria
+        $expenseData = AppBankManagerTransaction::whereHas('operationCategory.operationType', function ($q) {
+            $q->where('operation_type', 'expense');
+        })
+            ->with('operationCategory')
+            ->get()
+            ->groupBy('operationCategory.name')
+            ->map(function ($group) {
+                return $group->sum('amount');
+            });
+
+        $expenseLabels = $expenseData->keys();
+        $expenseValues = $expenseData->values();
+
+        return view('pages.bank-manager.testebank', compact('expenseLabels', 'expenseValues', 'totalIncome'));
+    }
     public function storeOperationCategory(Request $request)
     {
         $request->validate([
@@ -153,7 +170,6 @@ class BankManagerController extends Controller
         return redirect()->back()->with('success', 'Parcela marcada como paga!');
     }
 
-
     public function bulkMarkInstallmentsAsPaid(Request $request, $debtId)
     {
         $request->validate([
@@ -163,7 +179,7 @@ class BankManagerController extends Controller
         $debt = AppBankManagerDebt::with([
             'installmentsList' => function ($query) {
                 $query->whereNull('paid_at')->orderBy('due_date');
-            }
+            },
         ])->findOrFail($debtId);
 
         $toMark = $debt->installmentsList->take($request->quantity);
@@ -195,7 +211,6 @@ class BankManagerController extends Controller
         return redirect()->back()->with('success', 'Parcelas pagas com sucesso!');
     }
 
-
     public function editDebtor($id)
     {
         $debtor = AppBankManagerDebtor::findOrFail($id);
@@ -211,8 +226,6 @@ class BankManagerController extends Controller
         ]);
 
         $debtor = AppBankManagerDebtor::findOrFail($id);
-        
-        
 
         // Salva histórico de edição
         AppBankManagerDebtorEdit::create([
@@ -242,7 +255,4 @@ class BankManagerController extends Controller
 
         return redirect()->route('debtors.index')->with('success', 'Pagamento marcado como recebido.');
     }
-
-
-
 }

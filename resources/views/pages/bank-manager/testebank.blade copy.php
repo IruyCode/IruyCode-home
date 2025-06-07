@@ -34,7 +34,7 @@
                                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
                                     fill="none" />
                                 <circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2"
-                                    fill="none" />Metas
+                                    fill="none" />
                                 <circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2"
                                     fill="none" />
                             </svg>
@@ -99,94 +99,6 @@
             <!-- Saldo e Receitas/Despesas + Tabela de Transações (Dashboard) -->
             <template x-if="bloco === 'dashboard'" x-data="dashboard">
                 <div class="flex flex-col">
-                    <!-- Botões de Ação -->
-                    <div class="flex justify-end gap-4 mb-4">
-                        <button @click="showCategoriaModal = true" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                            </svg>
-                            Criar Categorias
-                        </button>
-                        <button @click="showDadosModal = true" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                            </svg>
-                            Adicionar Dados
-                        </button>
-                    </div>
-
-                    <!-- Modal Criar Categorias -->
-                    <div x-show="showCategoriaModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" @click.self="showCategoriaModal = false">
-                        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-xl font-bold text-white">Criar Nova Categoria</h3>
-                                <button @click="showCategoriaModal = false" class="text-gray-400 hover:text-white">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            <form @submit.prevent="submitCategoria">
-                                <div class="mb-4">
-                                    <label class="block text-gray-300 mb-2">Nome da Categoria</label>
-                                    <input type="text" x-model="novaCategoria.nome" class="w-full bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="block text-gray-300 mb-2">Tipo</label>
-                                    <select x-model="novaCategoria.tipo" class="w-full bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                        <option value="receita">Receita</option>
-                                        <option value="despesa">Despesa</option>
-                                    </select>
-                                </div>
-                                <div class="flex justify-end gap-2">
-                                    <button type="button" @click="showCategoriaModal = false" class="px-4 py-2 text-gray-300 hover:text-white">Cancelar</button>
-                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Salvar</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Modal Adicionar Dados -->
-                    <div x-show="showDadosModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" @click.self="showDadosModal = false">
-                        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-xl font-bold text-white">Adicionar Nova Transação</h3>
-                                <button @click="showDadosModal = false" class="text-gray-400 hover:text-white">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            <form @submit.prevent="submitDados">
-                                <div class="mb-4">
-                                    <label class="block text-gray-300 mb-2">Descrição</label>
-                                    <input type="text" x-model="novaTransacao.descricao" class="w-full bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="block text-gray-300 mb-2">Valor</label>
-                                    <input type="number" step="0.01" x-model="novaTransacao.valor" class="w-full bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="block text-gray-300 mb-2">Categoria</label>
-                                    <select x-model="novaTransacao.categoria" class="w-full bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                        <option value="">Selecione uma categoria</option>
-                                        <option value="mercado">Mercado</option>
-                                        <option value="transporte">Transporte</option>
-                                        <option value="educacao">Educação</option>
-                                    </select>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="block text-gray-300 mb-2">Data</label>
-                                    <input type="date" x-model="novaTransacao.data" class="w-full bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                </div>
-                                <div class="flex justify-end gap-2">
-                                    <button type="button" @click="showDadosModal = false" class="px-4 py-2 text-gray-300 hover:text-white">Cancelar</button>
-                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Salvar</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
                     <!-- Dashboard Financeiro Unificado -->
                     <div class="w-full py-6 md:py-8 bg-black rounded-xl shadow md:shadow-lg -mt-6 relative z-10">
                         <!-- Filtros -->
@@ -506,36 +418,12 @@
         // Componente Alpine.js para o dashboard
         document.addEventListener('alpine:init', () => {
             Alpine.data('dashboard', () => ({
-                showCategoriaModal: false,
-                showDadosModal: false,
-                novaCategoria: {
-                    nome: '',
-                    tipo: 'despesa'
-                },
-                novaTransacao: {
-                    descricao: '',
-                    valor: '',
-                    categoria: '',
-                    data: ''
-                },
                 init() {
                     this.$watch('bloco', (value) => {
                         if (value === 'dashboard') {
                             setTimeout(initChart, 100);
                         }
                     });
-                },
-                submitCategoria() {
-                    // Aqui você pode adicionar a lógica para salvar a categoria
-                    console.log('Nova categoria:', this.novaCategoria);
-                    this.showCategoriaModal = false;
-                    this.novaCategoria = { nome: '', tipo: 'despesa' };
-                },
-                submitDados() {
-                    // Aqui você pode adicionar a lógica para salvar a transação
-                    console.log('Nova transação:', this.novaTransacao);
-                    this.showDadosModal = false;
-                    this.novaTransacao = { descricao: '', valor: '', categoria: '', data: '' };
                 }
             }));
         });

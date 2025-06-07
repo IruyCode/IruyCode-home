@@ -44,10 +44,8 @@ Route::prefix('bank-manager')
 
         Route::post('/bank-manager/transactions', [BankManagerController::class, 'storeTransaction'])->name('transactions.store');
 
+        Route::get('/teste-banco', [BankManagerController::class, 'indexNew'])->name('indexNew');
 
-        Route::get('/teste-banco', function () {
-            return view('pages.bank-manager.testebank');
-        });
     });
 
 // Grupo Pomodoro Timer
