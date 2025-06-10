@@ -20,27 +20,6 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.4.1/css/dataTables.dateTime.min.css">
 
-    {{-- <style>
-        /* Corrige textos do DataTables no modo escuro */
-        .dataTables_wrapper {
-            color: #f3f4f6;
-            /* text-gray-100 */
-        }
-
-        .dataTables_paginate .paginate_button {
-            color: #f3f4f6 !important;
-            background-color: transparent !important;
-            border: 1px solid #4b5563;
-            /* gray-600 */
-        }
-
-        .dataTables_paginate .paginate_button.current {
-            background-color: #3b82f6 !important;
-            /* blue-500 */
-            color: white !important;
-        }
-    </style> --}}
-
 </head>
 
 <body x-data="{ menuAberto: false, bloco: 'dashboard' }" class="bg-aurora flex flex-col min-h-screen relative">
